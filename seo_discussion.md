@@ -23,21 +23,35 @@ Link equity is preserved on a couple different levels. One, the endpoint itself 
 
 ### Redirects
 The following is one of the scenarios search engines dislike the most: A link or button exists on a page and points to another internal page, but in a new version of the same page, that link now points externally. It's likely they assume this breaks trust with the user, since on the client side there's an enpoint that no longer exists and a new external path in it's place.
+
 In this scenario, pointing to a subdomain (even with the same endpoint) is considered external. This can create a large hit to SEO performance, especially when the change is first made. However, when the original endpoint still exists, but just redirects (through a 301 http response) to a page on a subdomain, the SEO gods are appeased and link equity can be 100% preserved.
+
 I'm a little bit cheeky here because I'm unclear as to whether this is just the proper way to make changes in the eyes of the search engine, or if it is simply tricking the crawlers into thinking the endpoint never changed at all (this is actually pretty likely since it would crawl the "external" page as a seperate process, it just sees a 301, knows it's not an error, and moves on). Regardless of the why, it is well documented that this method works and is the best way to make changes to site structure (see Seosly article).
 
 ### The Sitemap
 A sitemap is the structure of an entire site, typically in XML format (sometimes a better visual representation is created for human users). A sitemap is provided to search engine crawlers as a sitemap.xml file located at the root the server.
+
 The search engine crawlers will create their own version of a sitemap if it either does not exist, or does not encapsulate all of the pages/endoints the crawler finds on the site. This is often the case with wordpress as typically only adds files to the sitemap (rendering all the pages server side as wordpress does means crawlers can finc everything fine on their own).
+
 There are benefits to providing the sitemap to the crawlers in advance also, especially when making structural changes. This allows the crawlers to verify the site's structure quicker and with less iteration. This also allows for showing subdomain structures properly so links are less likely to be viewed as external. You can also demonstrate any quirks like /home and the root being the same.
+
 When migrating severs in any amount, generating a comprehensive sitemap and mimicking it's exact structure is imperitive for SEO. Verification can be done by generating a sitemap of the new server using the same tool and making sure they match up.
 
 ### Robots File
 Along with the sitemap file, a robots.txt file is also typically stored at the root. This file tells search engines what they should and shouldn't crawl. This is handy because you can exempt any pages where SEO is not a concern (in the case of MGC, this is almost everything except for landing pages, product pages, and the blog).
+
 This helps SEO rankings since pages with reactive elements tend to look strange to crawlers and often show as errors, hurting the "site health" score. This also means the crawlers can be more efficient, meaning crawling things like new articles happens faster without needing to check the entire site for other changes.
 
 ### Server Location and IP Address
-add notes and some more references here \\ ➖ ➖ ➖ ➖ ➖ ➖ ➖ ➖ ➖ ➖ ➖ ➖ ➖ ➖ ➖
+Through my research I've come to believe that changing servers and IP addresses has little impact on SEO, here's a concise article with some info specific to IP addresses and some notes directly from google.
+
+[WooRank: How will changin IP address impact SEO](https://www.woorank.com/en/blog/how-will-changing-ip-address-impact-seo)
+
+Google makes a large portion of it's cloud infrastructure income due to the Kubernettes platform, which allows instances of websites or applications to be spun up and spun down accross the globe to dynamically meet traffic demand. This is the reason that if I go to Amazon today and again tomorrow, I'll likely be accessing an entirely different server and therefor IP address than I did the say before. All search engines care about is the enpoint, site, and page structure being exactly the same accross these instances.
+
+There are a couple of notes specific to migrating to new servers. Since most of the time (especially in the case of WP engine) sites are sharing fractions of servers (and therefor have the same IP address), things like "noisy neighbors" or sites on the same server being marked as spam can have an impact on SEO for all domains pointing to that server. This can be remedied by requesting a new IP most of the time, however it's also possible to get entire machines for relatively cheap nowadays. This eliminates any issues that could arrise from shared servers.
+
+Another issue with changing servers is if the main datacenter is in an entirely different region, this is only an issue for sites that are distributing 2-3 instances manually, rather than a true distributed system (meaning: not MGC, we will likely still be in some east coast datacenter).
 
 ### Structured Data (Snippets)
 Structured data allows for snippets in search engine displays that show things like product information. This can help performance of product pages.
@@ -46,10 +60,10 @@ Structured data allows for snippets in search engine displays that show things l
 This is a way of strictly identifying links as internal to ensure that search engines can assess site structure quickly. 
 
 ### Semantic HTML
-Tags like <main>, <article>, <header>, <p>, rather than just a bunch of divs can help search engines read page structures better and can make pages like blog posts look more valuable.
+Tags like ```<main> <article> <header> <p>```, rather than just a bunch of divs can help search engines read page structures better and can make pages like blog posts look more valuable. Wordpress themes do a notoriously poor job of this since they rely on the id of the element rather than the tag itself. Relying on the id is very effective for creating reactive ui's, but generally unnecessary for static pages where SEO is important.
 
 ### Secure Certificates
-HTTPS is known to help significantly with SEO and it's worth enforcing even on completely static pages.
+HTTPS is known to help significantly with SEO and it's worth enforcing even on completely static pages. Wordpress does this most of the time, when building custom web apps this is also common since HTTPS is required for cookies, and cookies are required for authorization and event tracking.
 
 ### Mobile Friendly
 Having mobile friendly versions of landing pages tends to boost SEO, this is taken care of to some degree in most wordpress, and vanilla css themes, although some teaking is often still required.
