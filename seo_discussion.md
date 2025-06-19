@@ -2,7 +2,7 @@
 
 ## Architecture Agnostic SEO Concerns:
 
-Below I hope to organize my thoughts on what is important for SEO performance regardless of the final system architecture. You may already familiar with these concepts, this is as much for my own reference as is to convey them to others. I will relate these concerns to our architecture options later in this document.
+Below I hope to organize my thoughts on what is important for SEO performance regardless of the final system architecture. You may already familiar with these concepts, this is as much for my own reference as is to convey the information to others. I will relate these concerns to our architecture options later in this document.
 
 #### Here are some references that I found helpful, most of which are short reads if you're interested in diving deeper:
 
