@@ -73,15 +73,59 @@ Having mobile friendly versions of landing pages tends to boost SEO, this is tak
 ## Architecture Options
 Below are various options for the future architecture of MGC, arranged in order of the least change to the most.
 
+All but one of these architectures have a blue line (seperating the two servers), the information in the previous section dictates the way we cross this line is probably the most important factor for future SEO performance. Not which server existed first, or which side certain functionality lies on, but how the line is crossed. We only see one or two examples of crossing this line in the diagrams below, but we will likely have a handful of these paths.
+
+**The blue line shall only be crossed by a 301 redirect from an EXISTING endpoint. NOT a link to the "external" source.**
+
 ### All static pages and initial purchases on WordPress:
+In order to make purchases possible on our wordpress server, we will create the necessary data structures in our go database to handle verifying purchases from outside of the system itself. This can be done by simply recieving requests from wordpress at certain enpoints and expecting all the information about the purchase, student, time, etc in a certain json format. Webhooks shouldn't be necessary since we can get all the info we need client side on wordpress.
+
+This does open up discussions about running email delivery services in tandem, it's unclear to me without some further discussion whether this will be more or less compicated than relying on multiple api requests to kick off the email from the go server.
+
+All purchase information will be sent to Stripe and this will be the only source of absolute truth for purchases. Setting up products in Stripe and which server has access to those products will be important.
+
+We will also need to discus any period we wish to run the old system and new system in tandem This is more complex since we would need an additional copy of our static server to point to the old system while is is still in use, likely using yet another subdomain (maybe legacy.medgascerts or something).
+
+I believe the implementation below would be sufficient to make this possible:
+
+![Figma 1](https://github.com/user-attachments/assets/493437ac-0686-467e-8c1a-988e6e961132)
 
 
 ### Moving Google Analytics events to Go:
+One way we can simplify the architecture while keeping SEO optimized pages on wordpress is to sent events to google analytics from our go server (or client). This allows for google analytics to still be the source of truth for how these pages perform, all the way through to a user making a purchase, without needing those purchases to actually happen on wordpress.
 
+This is possible multiple ways, my favorite is server side using google tag manager. Here's an article that details how to set this up.
+[Simo Ahava: Server-side Tagging In Google Tag Manager](https://www.simoahava.com/analytics/server-side-tagging-google-tag-manager/)
+
+This not only simplifies how commerce is handled, but also opens some doors to how we can handle/analize our commerce data. One example: We can keep all product, discount, contact, etc. info away from Stripe (if we so choose). That means they only process credit cards for us at amounts we send them for every transaction. We can then run any reports we need to on our database, export directly to quickbooks, etc.
+
+![Figma 2](https://github.com/user-attachments/assets/f58ccc72-fa74-45ed-b18c-c92bd3ddb0f4)
 
 ### Moving web and product analytics to PostHog:
+I will be using Posthog on our site for some of it's unrelated functionality regardless of our architecture. Posthog is an open source suite of data products. Their web analytics are very similar to google analytics, but provide more custom events, which can be triggered server side. This allows for the client to send the data to a trusted source first (the server) meaning more events get tracked even when add blockers or certain browser protections are present.
 
+Posthog also has "product analytics", which allow for sales funnel metrics to be viewed alongside actual sales, and there are a handful of ways these two can influence each other on the platform.
+
+Other notable functionality includes:
+- Session replay: This shows an actual replay of user interactions on certain pages, very helpful for designing good interfaces, but also for analyzing sales funnels, handling support, etc.
+- Surveys: No-code, emebedable surveys that have great UX, allows survey data to be viewed alongside other tools like error tracking.
+- Data pipelines: These allow for piping data to many different integrations, **we could actually send analytics back to google analytics if that UI is prefered**, trigger email campeigns in sendgrid or mailchimp based off of any server event (user action, new blog post, etc), or link directly with hubspot to handle support or customer recources.
+
+![Figma 3](https://github.com/user-attachments/assets/3a94b3a6-88c5-4432-a915-38dd6a07c2fd)
 
 ### Moving static pages to HTML files on Go server:
+THE BLUE LINE IS GONE
 
+There are a handful of reasons hosting everything on a single server is a plus, the largest of which is not being concerned with handling "external" links correctly to preserve SEO performance. Some others are design consistency, general simplicicy, hosting costs, data reliability, etc. I am biased towards this approach. In light of that bias, I will dedicate most of this section to some of the downsides I see, and options for managing them.
 
+Wordpress is easier to edit. We know the interface, it's a decent one for making quick updates. The best option we have for mimicking this on a go server is rendering pages from text in markdown documents like this one. This makes editing text and writing new blog posts easy and efficient, but relies on premade page designs.
+
+We must create an exact copy of the sitemap. Mimicking the sitemap as close as we can becomes even more important when swapping everything over. This requires generating the maps multiple times and verifying the accuracy of the rebuild. The complexity can be mitigated to some degree by limiting what get's crawled in a robots.txt file.
+
+Content management is more complex. Things like images and videos should be added to the assets directory or object storage and then referenced by their relative path or url, this is not as intuitive as dragging and dropping in wordpress.
+
+Legacy data may not transfer. I've made successful migrations for a lot of MGC's existing database. Posthog allows importing past alaytics data. Other new elements are similar, but I do not feel comforatable guarenteeing that 100% of our legacy data will transfer to new systems.
+
+That being said, here is what I consider the cleanest architechture as far as SEO is concerned.
+
+![Figma 4](https://github.com/user-attachments/assets/68868f5e-8c32-46a1-ba44-e24079b29dd4)
