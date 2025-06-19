@@ -22,7 +22,7 @@ Another great checklist that emphasizes crawling both sites yourself and details
 
 ### Link Equity
 
-Link equity is preserved on a couple different levels. One, the endpoint itself (mgc.com/example) must refer to the same domain structure, and the request response should be OK (200) rather than a redirect. Two, the links referred to on that page (the next level of the site tree) should still point internally and have the same endpoint structure. This is where redirects over links to subdomains are of the utmost importance.
+Link equity is preserved on a couple different levels. One, for the high level pages where link equity is most important, the endpoint itself (mgc.com/example) must refer to the same domain structure and the request response should be OK (200) rather than a redirect. Two, the links referred to on that page (the next level of the site tree) should still point internally and have the same endpoint structure. This is where redirects over links to subdomains are of the utmost importance.
 
 ### Redirects
 
